@@ -1,0 +1,16 @@
+{
+  "name": "krax",
+  "version": "1.0.0",
+  "description": "",
+  "main": "krax.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "jquery": "^3.1.0",
+    "jsdom": "^9.4.1",
+    "promise": "^7.1.1"
+  }
+}
