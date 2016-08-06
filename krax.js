@@ -1,16 +1,13 @@
-"use strict";
+'use strict';
 
 let jsdom = require('jsdom')
-  , jQuery = require('jquery')
-  , Promise = require('promise');
+  , jQuery = require('jquery');
 
-let query = process.argv[2]
-  , limit = Number(process.argv[3]) || 0;
-
-searchByRelevance(query, limit).then(results => {
-  console.error(results.length + ' results');
-  console.log(results);
-});
+module.exports = {
+  search: searchByRelevance,
+  searchByRelevance: searchByRelevance,
+  searchByDistance: searchByDistance
+};
 
 function searchByRelevance (query, limit) {
   let url = 'http://www.krak.dk/person/resultat/' + encodeURIComponent(query);
@@ -35,6 +32,8 @@ function search (url, limit) {
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36'
     ];
 
+  limit = Math.max(0, limit)
+
   return process(url).then(() => {
     results.sort((a, b) => a.rank - b.rank);
     return results.slice(0, limit > 0 ? limit : results.length);
@@ -45,7 +44,7 @@ function search (url, limit) {
       userAgent: agents[Math.floor(Math.random() * agents.length)]
     };
 
-    console.error('Processing ' + url);
+    console.error('Processing %s', url);
 
     return new Promise((resolve, reject) => {
       jsdom.env(url, options, (err, window) => {
@@ -59,7 +58,7 @@ function search (url, limit) {
           , next = $('.paging .page-next a[href]');
 
         if (page++ === 1) {
-          console.error(pages + ' pages');
+          console.error('%s pages', pages);
         }
 
         $('#hit-list li')
