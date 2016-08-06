@@ -4,16 +4,31 @@ let jsdom = require('jsdom')
   , jQuery = require('jquery')
   , Promise = require('promise');
 
-search(process.argv[2], Number(process.argv[3]) || 0).then(results => {
+let query = process.argv[2]
+  , limit = Number(process.argv[3]) || 0;
+
+searchByRelevance(query, limit).then(results => {
   console.error(results.length + ' results');
   console.log(results);
 });
 
-function search (query, limit) {
+function searchByRelevance (query, limit) {
+  let url = 'http://www.krak.dk/person/resultat/' + encodeURIComponent(query);
+  return search (url, limit);
+}
+
+function searchByDistance (query, lat, lon, limit) {
+  let url = 'http://www.krak.dk/query?what=ps&proximity_area=proximity_all'
+    + '&search_word=' + encodeURIComponent(query)
+    + '&xcoord=' + lon
+    + '&ycoord=' + lat;
+  return search (url, limit);
+}
+
+function search (url, limit) {
   let results = []
     , page = 1
-    , url = 'http://www.krak.dk/person/resultat/' + encodeURIComponent(query)
-    , userAgents = [
+    , agents = [
       'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36',
       'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36',
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9',
@@ -26,12 +41,14 @@ function search (query, limit) {
   });
 
   function process (url) {
+    let options = {
+      userAgent: agents[Math.floor(Math.random() * agents.length)]
+    };
+
     console.error('Processing ' + url);
 
     return new Promise((resolve, reject) => {
-      jsdom.env(url, {
-        userAgent: userAgents[Math.floor(Math.random()*userAgents.length)]
-      }, (err, window) => {
+      jsdom.env(url, options, (err, window) => {
         if (err) {
           reject(err);
           return;
@@ -48,23 +65,29 @@ function search (query, limit) {
         $('#hit-list li')
         .get()
         .map(element => {
-          let text = x => $(element).find(x).first().text().trim()
-            , email = $(element)
-              .find('.self-info-list li')
-              .get()
-              .map(e => $(e).text().trim())
-              .filter(x => x.indexOf('@') > -1);
+          let text = x => x.text().trim()
+            , find = x => $(element).find(x)
+            , get = x => text(find(x))
+            , email = find('.self-info-list li').get().map(x => text($(x))).filter(x => x.indexOf('@') > -1)
+            , coordAttr = find('.hit-address-location').first().attr('data-coordinate')
+            , coordinates = null;
+
+          try {
+            coordinates = JSON.parse(coordAttr).coordinate;
+          } catch (e) { }
 
           return {
-            rank: Number(text('.hit-pin-number')),
-            name: text('.hit-name-ellipsis a'),
-            phone: text('.hit-phone-number').replace(/\s/g, '') || null,
-            address: text('.hit-street-address') || null,
-            zip: text('.hit-postal-code') || null,
-            city: text('.hit-address-locality') || null,
-            place: text('.hit-postal-place-name') || null,
-            title: text('.hit-name-ellipsis .person-title-result') || null,
-            email: email.length ? email[0] : null
+            rank: Number(get('.hit-pin-number')),
+            name: get('.hit-name-ellipsis a'),
+            phone: get('.hit-phone-number').replace(/\s/g, '') || null,
+            address: get('.hit-street-address') || null,
+            zip: get('.hit-postal-code') || null,
+            city: get('.hit-address-locality') || null,
+            place: get('.hit-postal-place-name') || null,
+            title: get('.hit-name-ellipsis .person-title-result') || null,
+            email: email.length ? email[0] : null,
+            lat: coordinates ? coordinates.lat : null,
+            lon: coordinates ? coordinates.lon : null
           };
         })
         .filter(x => x.rank && x.name)
