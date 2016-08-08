@@ -67,7 +67,7 @@ function search (url, limit) {
           let text = x => x.text().trim()
             , find = x => $(element).find(x)
             , get = x => text(find(x))
-            , email = find('.self-info-list li').get().map(x => text($(x))).filter(x => x.indexOf('@') > -1)
+            , email = find('.self-info-list li').get().map(x => text($(x))).filter(x => /.+@.+/.test(x))
             , coordAttr = find('.hit-address-location').first().attr('data-coordinate')
             , coordinates = null;
 
@@ -76,7 +76,7 @@ function search (url, limit) {
           } catch (e) { }
 
           return {
-            rank: Number(get('.hit-pin-number')),
+            rank: parseInt(get('.hit-pin-number')),
             name: get('.hit-name-ellipsis a'),
             phone: get('.hit-phone-number').replace(/\s/g, '') || null,
             address: get('.hit-street-address') || null,
