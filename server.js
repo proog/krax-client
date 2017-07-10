@@ -1,6 +1,7 @@
 'use strict';
 
-let krax = require('./krax.js')
+let { Krax } = require('krax')
+  , krax = new Krax()
   , app = require('express')()
   , port = 11181;
 

@@ -1,8 +1,8 @@
 {
-  "name": "krax",
+  "name": "krax-client",
   "version": "1.0.0",
   "description": "",
-  "main": "krax.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,7 +10,6 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.14.0",
-    "jquery": "^3.1.0",
-    "jsdom": "^9.4.1"
+    "krax": "^0.2.0"
   }
 }

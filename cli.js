@@ -1,6 +1,7 @@
 'use strict';
 
-let krax = require('./krax.js')
+let { Krax } = require('krax')
+  , krax = new Krax()
   , query = process.argv[2]
   , limit = parseInt(process.argv[3]) || 0;
 
