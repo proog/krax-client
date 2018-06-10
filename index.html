@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Krax</title>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; }
+  </style>
+</head>
+<body>
+  <h1>Krax</h1>
+  <p>
+    This is an example of a REST API for <a href="https://www.npmjs.com/package/krax">Krax</a>, a
+    highly unofficial library for Krak people search.
+  </p>
+  <p>You are seeing this page because no search query was specified.</p>
+
+  <h2>Request format</h2>
+  <p>
+    The only endpoint available is <strong>/</strong> which accepts the following query string
+    parameters. Providing both <strong>lat</strong> and <strong>lon</strong> results in a
+    distance-based search.
+  </p>
+  <ul>
+    <li><strong>q</strong> (required): text search query</li>
+    <li><strong>limit</strong>: max number of results to return</li>
+    <li><strong>lat</strong>: latitude as a number, e.g. <strong>-12.34</strong></li>
+    <li><strong>lon</strong>: longitude as a number</li>
+  </ul>
+
+  <h2>Response format</h2>
+  <p>Results are returned as a JSON array of objects of the following structure:</p>
+  <pre>{
+    rank: number
+    name: string
+    phone: string
+    address: string
+    zip: string
+    city: string
+    place: string
+    title: string
+    email: string
+    lat: number
+    lon: number
+}</pre>
+  <p>Any of these properties may be null depending on the data available.</p>
+</body>
+</html>

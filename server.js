@@ -2,6 +2,7 @@
 
 let { Krax } = require('krax')
   , krax = new Krax()
+  , path = require('path')
   , app = require('express')()
   , port = 11181;
 
@@ -13,7 +14,8 @@ app.get('/', (req, res) => {
     , promise;
 
   if (!query) {
-    res.status(400).send('Missing ?q parameter');
+    let html = path.join(__dirname, 'index.html');
+    res.status(400).sendFile(html);
     return;
   }
 
